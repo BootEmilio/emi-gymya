@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú de API</title>
+</head>
+<body>
+
+<h2>Gestion de api GymYa</h2>
+
+<label for="operation">Selecciona la operación:</label>
+<select id="operation">
+    <option value="GET">GET</option>
+    <option value="POST">POST</option>
+    <option value="DELETE">DELETE</option>
+    <option value="PATCH">PATCH</option>
+</select>
+
+<label for="resource">Selecciona el recurso:</label>
+<select id="resource">
+    <option value="gimnasios">Gimnasios</option>
+    <option value="clientes">Clientes</option>
+    <option value="entrenadores">Entrenadores</option>
+</select>
+
+<button id="executeBtn">Ejecutar</button>
+
+<div id="response"></div>
+
+<script>
+    document.getElementById('executeBtn').addEventListener('click', async function() {
+        const token = localStorage.getItem('token'); // Recuperar el token
+        const operation = document.getElementById('operation').value;
+        const resource = document.getElementById('resource').value;
+        const responseDiv = document.getElementById('response');
+        responseDiv.innerHTML = ''; // Limpiar la respuesta anterior
+
+        if (!token) {
+            // Si no hay token, redirigir a la página de login
+            alert('Debes iniciar sesión para acceder a esta funcionalidad.');
+            window.location.href = 'login.html'; // Cambia a la URL de tu página de login
+            return;
+        }
+
+        try {
+            let url = `http://localhost:3000/api/${resource}`;
+            let options = {
+                method: operation,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Agregar el token al encabezado
+                },
+            };
+
+            if (operation === 'POST' || operation === 'PATCH') {
+                const data = prompt('Introduce los datos en formato JSON:');
+                options.body = data; // Asignar el cuerpo de la solicitud
+            }
+
+            const res = await fetch(url, options);
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Error en la solicitud');
+            }
+
+            responseDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+            responseDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+        }
+    });
+</script>
+
+</body>
+</html>

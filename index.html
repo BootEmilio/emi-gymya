@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+</head>
+<body>
+    <div class="Inicio">
+        <form class="inicio-form" id="loginForm"> <!-- Asegúrate de que el id esté definido -->
+            <h2>Iniciar Sesión</h2>
+            <div class="input-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Ingresar</button>
+        </form>
+    </div>
+    <script>
+        const loginForm = document.getElementById('loginForm'); // Asegúrate de que el id sea correcto
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevenir el envío del formulario
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.token); // Almacenar el token
+                // Redirigir a la página de menú
+                window.location.href = 'menu.html'; // Cambia a la URL que deseas
+            } else {
+                const errorData = await response.json();
+                console.error('Error de login:', errorData.message);
+                alert('Credenciales inválidas, por favor intenta nuevamente.'); // Puedes agregar una alerta
+            }
+        });
+    </script>
+</body>
+</html>
