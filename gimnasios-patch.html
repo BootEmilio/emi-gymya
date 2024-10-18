@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Gimnasio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 class="text-2xl font-semibold text-center mb-6">Actualizar Gimnasio</h2>
+
+        <form id="patchGymForm" class="space-y-4">
+            <div>
+                <label for="id_gym" class="block text-gray-700">ID del Gimnasio:</label>
+                <input type="text" id="id_gym" name="id_gym" class="w-full p-2 border border-gray-300 rounded" required>
+            </div>
+
+            <div>
+                <label for="codigo_gym" class="block text-gray-700">Código del Gimnasio:</label>
+                <input type="text" id="codigo_gym" name="codigo_gym" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="nombre" class="block text-gray-700">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="pais" class="block text-gray-700">País:</label>
+                <input type="text" id="pais" name="pais" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="estado" class="block text-gray-700">Estado:</label>
+                <input type="text" id="estado" name="estado" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="ciudad" class="block text-gray-700">Ciudad:</label>
+                <input type="text" id="ciudad" name="ciudad" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="direccion" class="block text-gray-700">Dirección:</label>
+                <input type="text" id="direccion" name="direccion" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="codigoPostal" class="block text-gray-700">Código Postal:</label>
+                <input type="text" id="codigoPostal" name="codigoPostal" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="RFC" class="block text-gray-700">RFC:</label>
+                <input type="text" id="RFC" name="RFC" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <div>
+                <label for="imagen" class="block text-gray-700">Imagen:</label>
+                <input type="text" id="imagen" name="imagen" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 rounded hover:bg-blue-600 transition duration-200">
+                Actualizar Gimnasio
+            </button>
+        </form>
+
+        <div id="response" class="mt-4"></div>
+    </div>
+
+    <script>
+        document.getElementById('patchGymForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+            const token = localStorage.getItem('token'); // Recuperar el token del usuario
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = ''; // Limpiar la respuesta anterior
+
+            const id_gym = document.getElementById('id_gym').value; // Obtener el ID del gimnasio
+            const url = `https://api-gymya-api.onrender.com/api/gimnasios/${id_gym}`;
+
+            const gymData = {
+                codigo_gym: document.getElementById('codigo_gym').value || undefined,
+                Nombre: document.getElementById('nombre').value || undefined,
+                Pais: document.getElementById('pais').value || undefined,
+                Estado: document.getElementById('estado').value || undefined,
+                Ciudad: document.getElementById('ciudad').value || undefined,
+                Direccion: document.getElementById('direccion').value || undefined,
+                CodigoPostal: document.getElementById('codigoPostal').value || undefined,
+                RFC: document.getElementById('RFC').value || undefined,
+                imagen: document.getElementById('imagen').value || undefined
+            };
+
+            // Eliminar los campos no modificados (undefined) para no enviarlos
+            Object.keys(gymData).forEach(key => gymData[key] === undefined && delete gymData[key]);
+
+            try {
+                const res = await fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Agregar el token al encabezado
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(gymData)
+                });
+
+                const data = await res.json(); // Convertir la respuesta en JSON
+
+                if (!res.ok) {
+                    throw new Error(data.message || 'Error en la solicitud');
+                }
+
+                // Mostrar el resultado de la operación en la página
+                responseDiv.innerHTML = `<pre class="bg-green-100 p-4 rounded">${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                // Mostrar el mensaje de error en caso de que algo falle
+                responseDiv.innerHTML = `<pre class="bg-red-100 p-4 rounded">Error: ${error.message}</pre>`;
+            }
+        });
+    </script>
+
+</body>
+</html>
