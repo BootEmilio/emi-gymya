@@ -54,7 +54,7 @@
             responseDiv.innerHTML = ''; // Limpiar la respuesta anterior
 
             const id_gym = document.getElementById('id_gym').value; // Obtener el ID del gimnasio
-            const url = `http://localhost:3000/api/gimnasios/${id_gym}`;
+            const url = `https://api-gymya-api.onrender.com/api/gimnasios/${id_gym}`;
 
             const gymData = {
                 codigo_gym: document.getElementById('codigo_gym').value || undefined,
