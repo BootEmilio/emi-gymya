@@ -4,73 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú de API</title>
-    <link rel="stylesheet" href="./css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
 
-<h2>Gestion de api GymYa</h2>
+<h2 class="text-2xl font-bold mb-6">Gestión de API GymYa</h2>
 
-<label for="operation">Selecciona la operación:</label>
-<select id="operation">
-    <option value="GET">GET</option>
-    <option value="POST">POST</option>
-    <option value="DELETE">DELETE</option>
-    <option value="PATCH">PATCH</option>
-</select>
+<div class="mb-4">
+    <h3 class="text-lg font-semibold mb-2">Selecciona el recurso:</h3>
+    <div class="grid grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-200" onclick="selectResource('gimnasios')">
+            <h4 class="text-center">Gimnasios</h4>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-200" onclick="selectResource('entrenadores')">
+            <h4 class="text-center">Entrenadores</h4>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-200" onclick="selectResource('clientes')">
+            <h4 class="text-center">Clientes</h4>
+        </div>
+    </div>
+</div>
 
-<label for="resource">Selecciona el recurso:</label>
-<select id="resource">
-    <option value="gimnasios">Gimnasios</option>
-    <option value="clientes">Clientes</option>
-    <option value="entrenadores">Entrenadores</option>
-</select>
+<div class="mb-4">
+    <h3 class="text-lg font-semibold mb-2">Selecciona la operación:</h3>
+    <div class="grid grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-200" onclick="selectOperation('GET')">
+            <h4 class="text-center">GET</h4>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-200" onclick="selectOperation('POST')">
+            <h4 class="text-center">POST</h4>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-200" onclick="selectOperation('PATCH')">
+            <h4 class="text-center">PATCH</h4>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-200" onclick="selectOperation('DELETE')">
+            <h4 class="text-center">DELETE</h4>
+        </div>
+    </div>
+</div>
 
-<button id="executeBtn">Ejecutar</button>
+<button id="executeBtn" class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">Ejecutar</button>
 
-<div id="response"></div>
+<button id="logoutBtn" class="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 transition duration-200">
+    Cerrar Sesión
+</button>
+
 
 <script>
-    document.getElementById('executeBtn').addEventListener('click', async function() {
-        const token = localStorage.getItem('token'); // Recuperar el token
-        const operation = document.getElementById('operation').value;
-        const resource = document.getElementById('resource').value;
-        const responseDiv = document.getElementById('response');
-        responseDiv.innerHTML = ''; // Limpiar la respuesta anterior
+    let selectedResource = '';
+    let selectedOperation = '';
 
-        if (!token) {
-            // Si no hay token, redirigir a la página de login
-            alert('Debes iniciar sesión para acceder a esta funcionalidad.');
-            window.location.href = 'login.html'; // Cambia a la URL de tu página de login
+    function selectResource(resource) {
+        selectedResource = resource;
+        document.querySelectorAll('[onclick^="selectResource"]').forEach(element => {
+            element.classList.remove('bg-gray-200'); // Restablece el color de fondo
+        });
+        event.currentTarget.classList.add('bg-gray-200'); // Marca el recurso seleccionado
+    }
+
+    function selectOperation(operation) {
+        selectedOperation = operation;
+        document.querySelectorAll('[onclick^="selectOperation"]').forEach(element => {
+            element.classList.remove('bg-gray-200'); // Restablece el color de fondo
+        });
+        event.currentTarget.classList.add('bg-gray-200'); // Marca la operación seleccionada
+    }
+
+    document.getElementById('executeBtn').addEventListener('click', function() {
+        if (!selectedResource || !selectedOperation) {
+            alert('Por favor, selecciona un recurso y una operación.');
             return;
         }
 
-        try {
-            let url = `https://api-gymya-api.onrender.com/api/${resource}`;
-            let options = {
-                method: operation,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Agregar el token al encabezado
-                },
-            };
+        const token = localStorage.getItem('token'); // Recuperar el token
 
-            if (operation === 'POST' || operation === 'PATCH') {
-                const data = prompt('Introduce los datos en formato JSON:');
-                options.body = data; // Asignar el cuerpo de la solicitud
-            }
-
-            const res = await fetch(url, options);
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || 'Error en la solicitud');
-            }
-
-            responseDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-        } catch (error) {
-            responseDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+        if (!token) {
+            alert('Debes iniciar sesión para acceder a esta funcionalidad.');
+            window.location.href = 'login.html'; // Redirigir a la página de login si no hay token
+            return;
         }
+
+        // Redirigir a la página HTML correspondiente según el recurso y la operación
+        const page = `${selectedResource}-${selectedOperation.toLowerCase()}.html`;
+        window.location.href = page;
     });
+
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+            // Eliminar el token de localStorage
+            localStorage.removeItem('token');
+            // Redirigir a la página de login
+            window.location.href = 'index.html'; // Cambia a la URL que deseas
+        });
+    </script>
 </script>
 
 </body>
