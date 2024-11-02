@@ -3,98 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú de API</title>
+    <title>Dashboard de Administración</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Añade tu archivo de CSS aquí -->
 </head>
 <body>
 
-<h2>Gestión de API GymYa</h2>
+<h2>Dashboard de Administración</h2>
 
-<div>
-    <h3>Selecciona el recurso:</h3>
-    <div>
-        <div onclick="selectResource('gimnasios')">
-            <h4 class="text-center">Gimnasios</h4>
-        </div>
-        <div onclick="selectResource('entrenadores')">
-            <h4 class="text-center">Entrenadores</h4>
-        </div>
-        <div onclick="selectResource('clientes')">
-            <h4>Clientes</h4>
-        </div>
-    </div>
+<div id="dashboard">
+    <!-- Resumen Financiero -->
+    <section id="financialSummary">
+        <h3>Resumen Financiero</h3>
+        <p>Ingresos mensuales: <span id="monthlyIncome"></span></p>
+        <p>Pagos pendientes: <span id="pendingPayments"></span></p>
+        <p>Membresías activas:</p>
+        <ul id="activeMemberships"></ul>
+        <div id="incomeChart" style="width: 100%; height: 400px;"></div>
+    </section>
+
+    <!-- Estadísticas de Clientes -->
+    <section id="clientStatistics">
+        <h3>Estadísticas de Clientes</h3>
+        <p>Total de clientes activos: <span id="activeClients"></span></p>
+        <p>Clientes nuevos este mes: <span id="newClientsThisMonth"></span></p>
+        <p>Clientes por tipo de membresía:</p>
+        <ul id="clientsByMembershipType"></ul>
+    </section>
+
+    <!-- Actividades y Asistencias -->
+    <section id="activities">
+        <h3>Actividades y Asistencias</h3>
+        <p>Asistencias diarias: <span id="dailyAttendances"></span></p>
+        <div id="peakHoursChart" style="width: 100%; height: 400px;"></div>
+        <h4>Historial de accesos reciente</h4>
+        <ul id="recentAccessHistory"></ul>
+        <h4>Clientes con más asistencias</h4>
+        <ul id="topAttendees"></ul>
+    </section>
+
+    <!-- Alertas y Notificaciones -->
+    <section id="alerts">
+        <h3>Alertas y Notificaciones</h3>
+        <ul id="paymentAlerts"></ul>
+        <ul id="membershipExpiryAlerts"></ul>
+    </section>
+
+    <!-- Acceso rápido a Funcionalidades -->
+    <section id="quickAccess">
+        <h3>Acceso rápido</h3>
+        <button onclick="registerNewClient()">Registro de nuevos clientes</button>
+        <button onclick="registerPayment()">Registro de pago</button>
+        <button onclick="manageMemberships()">Administración de membresías</button>
+        <button onclick="viewClientHistory()">Historial de clientes</button>
+    </section>
+
+    <!-- Reportes -->
+    <section id="reports">
+        <h3>Reportes</h3>
+        <button onclick="generateReport()">Generar Reporte</button>
+        <button onclick="exportData()">Exportar datos</button>
+    </section>
 </div>
-
-<div class=>
-    <h3>Selecciona la operación:</h3>
-    <div>
-        <div onclick="selectOperation('GET')">
-            <h4 class="text-center">GET</h4>
-        </div>
-        <div onclick="selectOperation('POST')">
-            <h4 class="text-center">POST</h4>
-        </div>
-        <div onclick="selectOperation('PATCH')">
-            <h4 class="text-center">PATCH</h4>
-        </div>
-        <div onclick="selectOperation('DELETE')">
-            <h4 class="text-center">DELETE</h4>
-        </div>
-    </div>
-</div>
-
-<button id="executeBtn">Ejecutar</button>
-
-<button id="logoutBtn">
-    Cerrar Sesión
-</button>
-
 
 <script>
-    let selectedResource = '';
-    let selectedOperation = '';
-
-    function selectResource(resource) {
-        selectedResource = resource;
-        document.querySelectorAll('[onclick^="selectResource"]').forEach(element => {
-            element.classList.remove('bg-gray-200'); // Restablece el color de fondo
-        });
-        event.currentTarget.classList.add('bg-gray-200'); // Marca el recurso seleccionado
-    }
-
-    function selectOperation(operation) {
-        selectedOperation = operation;
-        document.querySelectorAll('[onclick^="selectOperation"]').forEach(element => {
-            element.classList.remove('bg-gray-200'); // Restablece el color de fondo
-        });
-        event.currentTarget.classList.add('bg-gray-200'); // Marca la operación seleccionada
-    }
-
-    document.getElementById('executeBtn').addEventListener('click', function() {
-        if (!selectedResource || !selectedOperation) {
-            alert('Por favor, selecciona un recurso y una operación.');
-            return;
-        }
-
-        const token = localStorage.getItem('token'); // Recuperar el token
-
+    document.addEventListener("DOMContentLoaded", async () => {
+        const token = localStorage.getItem('token');
         if (!token) {
-            alert('Debes iniciar sesión para acceder a esta funcionalidad.');
-            window.location.href = 'login.html'; // Redirigir a la página de login si no hay token
+            alert("Debe iniciar sesión para acceder al dashboard.");
+            window.location.href = 'login.html';
             return;
         }
 
-        // Redirigir a la página HTML correspondiente según el recurso y la operación
-        const page = `${selectedResource}-${selectedOperation.toLowerCase()}.html`;
-        window.location.href = page;
+        const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+        // Resumen Financiero
+        await fetchFinancialSummary(headers);
+
+        // Estadísticas de Clientes
+        await fetchClientStatistics(headers);
+
+        // Actividades y Asistencias
+        await fetchActivityData(headers);
+
+        // Alertas y Notificaciones
+        await fetchAlerts(headers);
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-            // Eliminar el token de localStorage
-            localStorage.removeItem('token');
-            // Redirigir a la página de login
-            window.location.href = 'index.html'; // Cambia a la URL que deseas
-        });
-    </script>
+    async function fetchFinancialSummary(headers) {
+        try {
+            const response = await fetch('https://api-gymya-api.onrender.com/api/financial-summary', { headers });
+            const data = await response.json();
+            document.getElementById("monthlyIncome").innerText = data.monthlyIncome;
+            document.getElementById("pendingPayments").innerText = data.pendingPayments;
+            document.getElementById("activeMemberships").innerHTML = data.activeMemberships.map(m => `<li>${m.type}: ${m.count}</li>`).join('');
+            renderChart("incomeChart", data.incomeChartData);
+        } catch (error) {
+            console.error("Error fetching financial summary:", error);
+        }
+    }
+
+    async function fetchClientStatistics(headers) {
+        try {
+            const response = await fetch('https://api-gymya-api.onrender.com/api/client-statistics', { headers });
+            const data = await response.json();
+            document.getElementById("activeClients").innerText = data.activeClients;
+            document.getElementById("newClientsThisMonth").innerText = data.newClientsThisMonth;
+            document.getElementById("clientsByMembershipType").innerHTML = data.clientsByMembershipType.map(c => `<li>${c.type}: ${c.count}</li>`).join('');
+        } catch (error) {
+            console.error("Error fetching client statistics:", error);
+        }
+    }
+
+    async function fetchActivityData(headers) {
+        try {
+            const response = await fetch('https://api-gymya-api.onrender.com/api/activity-data', { headers });
+            const data = await response.json();
+            document.getElementById("dailyAttendances").innerText = data.dailyAttendances;
+            document.getElementById("recentAccessHistory").innerHTML = data.recentAccessHistory.map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('');
+            document.getElementById("topAttendees").innerHTML = data.topAttendees.map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('');
+            renderChart("peakHoursChart", data.peakHoursData);
+        } catch (error) {
+            console.error("Error fetching activity data:", error);
+        }
+    }
+
+    async function fetchAlerts(headers) {
+        try {
+            const response = await fetch('https://api-gymya-api.onrender.com/api/alerts', { headers });
+            const data = await response.json();
+            document.getElementById("paymentAlerts").innerHTML = data.paymentAlerts.map(p => `<li>${p}</li>`).join('');
+            document.getElementById("membershipExpiryAlerts").innerHTML = data.membershipExpiryAlerts.map(m => `<li>${m}</li>`).join('');
+        } catch (error) {
+            console.error("Error fetching alerts:", error);
+        }
+    }
+
+    function renderChart(containerId, data) {
+        // Asume que estás usando una biblioteca como Chart.js para las gráficas
+        const ctx = document.getElementById(containerId).getContext('2d');
+        new Chart(ctx, { type: 'line', data: data });
+    }
+
+    function registerNewClient() { window.location.href = "register-client.html"; }
+    function registerPayment() { window.location.href = "register-payment.html"; }
+    function manageMemberships() { window.location.href = "manage-memberships.html"; }
+    function viewClientHistory() { window.location.href = "client-history.html"; }
+    function generateReport() { /* lógica de generación de reportes */ }
+    function exportData() { /* lógica de exportación de datos */ }
 </script>
 
 </body>
