@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 // Función para obtener el resumen financiero
 async function fetchFinancialSummary(headers) {
     try {
-        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticas/financieras', {
+        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticasfinancieras', {
             method: 'GET',
             headers: headers
         });
@@ -52,7 +52,7 @@ async function fetchFinancialSummary(headers) {
 // Función para obtener estadísticas de clientes
 async function fetchClientStatistics(headers) {
     try {
-        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticas/clientes', {
+        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticasclientes', {
             method: 'GET',
             headers: headers
         });
@@ -79,7 +79,7 @@ async function fetchClientStatistics(headers) {
 // Función para obtener datos de actividad
 async function fetchActivityData(headers) {
     try {
-        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticas/asistencias', {
+        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticasasistencias', {
             method: 'GET',
             headers: headers
         });
@@ -112,7 +112,7 @@ async function fetchActivityData(headers) {
 // Función para obtener alertas
 async function fetchAlerts(headers) {
     try {
-        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticas/alertas', {
+        const response = await fetch('https://api-gymya-api.onrender.com/api/estadisticasalertas', {
             method: 'GET',
             headers: headers
         });
