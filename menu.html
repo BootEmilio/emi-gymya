@@ -1,163 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Administración</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>Menu Administrador</title>
 </head>
 <body>
-
-<h2>Dashboard de Administración</h2>
-
-<div id="dashboard">
-    <!-- Resumen Financiero -->
-    <section id="financialSummary">
-        <h3>Resumen Financiero</h3>
-        <p>Ingresos mensuales: <span id="monthlyIncome"></span></p>
-        <p>Pagos pendientes: <span id="pendingPayments"></span></p>
-        <p>Membresías activas:</p>
-        <ul id="activeMemberships"></ul>
-        <div id="incomeChart" style="width: 100%; height: 400px;"></div>
-    </section>
-
-    <!-- Estadísticas de Clientes -->
-    <section id="clientStatistics">
-        <h3>Estadísticas de Clientes</h3>
-        <p>Total de clientes activos: <span id="activeClients"></span></p>
-        <p>Clientes nuevos este mes: <span id="newClientsThisMonth"></span></p>
-        <p>Clientes por tipo de membresía:</p>
-        <ul id="clientsByMembershipType"></ul>
-    </section>
-
-    <!-- Actividades y Asistencias -->
-    <section id="activities">
-        <h3>Actividades y Asistencias</h3>
-        <p>Asistencias diarias: <span id="dailyAttendances"></span></p>
-        <div id="peakHoursChart" style="width: 100%; height: 400px;"></div>
-        <h4>Historial de accesos reciente</h4>
-        <ul id="recentAccessHistory"></ul>
-        <h4>Clientes con más asistencias</h4>
-        <ul id="topAttendees"></ul>
-    </section>
-
-    <!-- Alertas y Notificaciones -->
-    <section id="alerts">
-        <h3>Alertas y Notificaciones</h3>
-        <ul id="paymentAlerts"></ul>
-        <ul id="membershipExpiryAlerts"></ul>
-    </section>
-
-    <!-- Acceso rápido a Funcionalidades -->
-    <section id="quickAccess">
-        <h3>Acceso rápido</h3>
-        <button onclick="registerNewClient()">Registro de nuevos usuarios</button>
-        <button onclick="registerPayment()">Registro de pago</button>
-        <button onclick="manageMemberships()">Administración de membresías</button>
-        <button onclick="viewClientHistory()">Historial de clientes</button>
-    </section>
-
-    <!-- Reportes -->
-    <section id="reports">
-        <h3>Reportes</h3>
-        <button onclick="generateReport()">Generar Reporte</button>
-        <button onclick="exportData()">Exportar datos</button>
-    </section>
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert("Debe iniciar sesión para acceder al dashboard.");
-            window.location.href = 'login.html';
-            return;
-        }
-
-        const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-
-        // Resumen Financiero
-        await fetchFinancialSummary(headers);
-
-        // Estadísticas de Clientes
-        await fetchClientStatistics(headers);
-
-        // Actividades y Asistencias
-        await fetchActivityData(headers);
-
-        // Alertas y Notificaciones
-        await fetchAlerts(headers);
-    });
-
-    async function fetchData(url, headers, successCallback) {
-        try {
-            const response = await fetch(url, { headers });
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
-            const data = await response.json();
-            successCallback(data);
-        } catch (error) {
-            console.error(`Error fetching data from ${url}:`, error);
-            alert('Ocurrió un error al cargar los datos. Inténtelo más tarde.');
-        }
-    }
-
-    async function fetchFinancialSummary(headers) {
-        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/financieras', headers, (data) => {
-            document.getElementById("monthlyIncome").innerText = data?.monthlyIncome || 0;
-            document.getElementById("pendingPayments").innerText = data?.pendingPayments || 0;
-            document.getElementById("activeMemberships").innerHTML = Array.isArray(data?.activeMemberships) 
-                ? data.activeMemberships.map(m => `<li>${m.type}: ${m.count}</li>`).join('') 
-                : "<li>No data</li>";
-            renderChart("incomeChart", data?.incomeChartData);
-        });
-    }
-
-    async function fetchClientStatistics(headers) {
-        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/clientes', headers, (data) => {
-            document.getElementById("activeClients").innerText = data?.activeClients || 0;
-            document.getElementById("newClientsThisMonth").innerText = data?.newClientsThisMonth || 0;
-            document.getElementById("clientsByMembershipType").innerHTML = Array.isArray(data?.clientsByMembershipType) 
-                ? data.clientsByMembershipType.map(c => `<li>${c.type}: ${c.count}</li>`).join('') 
-                : "<li>No data</li>";
-        });
-    }
-
-    async function fetchActivityData(headers) {
-        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/asistencias', headers, (data) => {
-            document.getElementById("dailyAttendances").innerText = data?.dailyAttendances || 0;
-            document.getElementById("recentAccessHistory").innerHTML = Array.isArray(data?.recentAccessHistory) 
-                ? data.recentAccessHistory.map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('') 
-                : "<li>No data</li>";
-            document.getElementById("topAttendees").innerHTML = Array.isArray(data?.topAttendees) 
-                ? data.topAttendees.map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('') 
-                : "<li>No data</li>";
-            renderChart("peakHoursChart", data?.peakHoursData);
-        });
-    }
-
-    async function fetchAlerts(headers) {
-        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/alertas', headers, (data) => {
-            document.getElementById("paymentAlerts").innerHTML = Array.isArray(data?.paymentAlerts) 
-                ? data.paymentAlerts.map(p => `<li>${p}</li>`).join('') 
-                : "<li>No data</li>";
-            document.getElementById("membershipExpiryAlerts").innerHTML = Array.isArray(data?.membershipExpiryAlerts) 
-                ? data.membershipExpiryAlerts.map(m => `<li>${m}</li>`).join('') 
-                : "<li>No data</li>";
-        });
-    }
-
-    function renderChart(containerId, data) {
-        if (!data) return; // Verifica si hay datos para mostrar
-        const ctx = document.getElementById(containerId).getContext('2d');
-        new Chart(ctx, { type: 'line', data: data });
-    }
-
-    function registerNewClient() { window.location.href = "register-client.html"; }
-    function registerPayment() { window.location.href = "register-payment.html"; }
-    function manageMemberships() { window.location.href = "manage-memberships.html"; }
-    function viewClientHistory() { window.location.href = "client-history.html"; }
-    function generateReport() { /* lógica de generación de reportes */ }
-    function exportData() { /* lógica de exportación de datos */ }
-</script>
+    <h1>Menu Administrador</h1>
+    <nav>
+        <ul>
+            <li><a href="financial-summary.html">Resumen Financiero</a></li>
+            <li><a href="client-statistics.html">Estadísticas de Clientes</a></li>
+            <li><a href="activity-data.html">Actividades y Asistencias</a></li>
+            <li><a href="alerts.html">Alertas y Notificaciones</a></li>
+        </ul>
+    </nav>
+    <script src="/scripts/dashboard.js"></script>
 </body>
 </html>
