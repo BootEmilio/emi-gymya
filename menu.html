@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Administración</title>
     <link rel="stylesheet" href="styles.css"> <!-- Añade tu archivo de CSS aquí -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -89,54 +90,50 @@
         await fetchAlerts(headers);
     });
 
-    async function fetchFinancialSummary(headers) {
-        try {
-            const response = await fetch('https://api-gymya-api.onrender.com/api/financial-summary', { headers });
-            const data = await response.json();
-            document.getElementById("monthlyIncome").innerText = data.monthlyIncome;
-            document.getElementById("pendingPayments").innerText = data.pendingPayments;
-            document.getElementById("activeMemberships").innerHTML = data.activeMemberships.map(m => `<li>${m.type}: ${m.count}</li>`).join('');
-            renderChart("incomeChart", data.incomeChartData);
-        } catch (error) {
-            console.error("Error fetching financial summary:", error);
-        }
+    async function fetchData(url, headers, successCallback) {
+    try {
+        const response = await fetch(url, { headers });
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+        const data = await response.json();
+        successCallback(data);
+    } catch (error) {
+        console.error(`Error fetching data from ${url}:`, error);
+        alert('Ocurrió un error al cargar los datos. Inténtelo más tarde.');
     }
+}
+
+async function fetchFinancialSummary(headers) {
+    fetchData('https://api-gymya-api.onrender.com/api/financial-summary', headers, (data) => {
+        document.getElementById("monthlyIncome").innerText = data.monthlyIncome;
+        document.getElementById("pendingPayments").innerText = data.pendingPayments;
+        document.getElementById("activeMemberships").innerHTML = data.activeMemberships.map(m => `<li>${m.type}: ${m.count}</li>`).join('');
+        renderChart("incomeChart", data.incomeChartData);
+    });
+}
 
     async function fetchClientStatistics(headers) {
-        try {
-            const response = await fetch('https://api-gymya-api.onrender.com/api/client-statistics', { headers });
-            const data = await response.json();
-            document.getElementById("activeClients").innerText = data.activeClients;
-            document.getElementById("newClientsThisMonth").innerText = data.newClientsThisMonth;
-            document.getElementById("clientsByMembershipType").innerHTML = data.clientsByMembershipType.map(c => `<li>${c.type}: ${c.count}</li>`).join('');
-        } catch (error) {
-            console.error("Error fetching client statistics:", error);
-        }
-    }
+    fetchData('https://api-gymya-api.onrender.com/api/client-statistics', headers, (data) => {
+        document.getElementById("activeClients").innerText = data.activeClients;
+        document.getElementById("newClientsThisMonth").innerText = data.newClientsThisMonth;
+        document.getElementById("clientsByMembershipType").innerHTML = data.clientsByMembershipType.map(c => `<li>${c.type}: ${c.count}</li>`).join('');
+    });
+}
 
-    async function fetchActivityData(headers) {
-        try {
-            const response = await fetch('https://api-gymya-api.onrender.com/api/activity-data', { headers });
-            const data = await response.json();
-            document.getElementById("dailyAttendances").innerText = data.dailyAttendances;
-            document.getElementById("recentAccessHistory").innerHTML = data.recentAccessHistory.map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('');
-            document.getElementById("topAttendees").innerHTML = data.topAttendees.map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('');
-            renderChart("peakHoursChart", data.peakHoursData);
-        } catch (error) {
-            console.error("Error fetching activity data:", error);
-        }
-    }
+async function fetchActivityData(headers) {
+    fetchData('https://api-gymya-api.onrender.com/api/activity-data', headers, (data) => {
+        document.getElementById("dailyAttendances").innerText = data.dailyAttendances;
+        document.getElementById("recentAccessHistory").innerHTML = data.recentAccessHistory.map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('');
+        document.getElementById("topAttendees").innerHTML = data.topAttendees.map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('');
+        renderChart("peakHoursChart", data.peakHoursData);
+    });
+}
 
-    async function fetchAlerts(headers) {
-        try {
-            const response = await fetch('https://api-gymya-api.onrender.com/api/alerts', { headers });
-            const data = await response.json();
-            document.getElementById("paymentAlerts").innerHTML = data.paymentAlerts.map(p => `<li>${p}</li>`).join('');
-            document.getElementById("membershipExpiryAlerts").innerHTML = data.membershipExpiryAlerts.map(m => `<li>${m}</li>`).join('');
-        } catch (error) {
-            console.error("Error fetching alerts:", error);
-        }
-    }
+async function fetchAlerts(headers) {
+    fetchData('https://api-gymya-api.onrender.com/api/alerts', headers, (data) => {
+        document.getElementById("paymentAlerts").innerHTML = data.paymentAlerts.map(p => `<li>${p}</li>`).join('');
+        document.getElementById("membershipExpiryAlerts").innerHTML = data.membershipExpiryAlerts.map(m => `<li>${m}</li>`).join('');
+    });
+}
 
     function renderChart(containerId, data) {
         // Asume que estás usando una biblioteca como Chart.js para las gráficas
