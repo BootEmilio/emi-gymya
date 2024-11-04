@@ -91,52 +91,58 @@
     });
 
     async function fetchData(url, headers, successCallback) {
-    try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) throw new Error('Error en la respuesta del servidor');
-        const data = await response.json();
-        successCallback(data);
-    } catch (error) {
-        console.error(`Error fetching data from ${url}:`, error);
-        alert('Ocurrió un error al cargar los datos. Inténtelo más tarde.');
+        try {
+            const response = await fetch(url, { headers });
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            const data = await response.json();
+            successCallback(data);
+        } catch (error) {
+            console.error(`Error fetching data from ${url}:`, error);
+            alert('Ocurrió un error al cargar los datos. Inténtelo más tarde.');
+        }
     }
-}
 
-async function fetchFinancialSummary(headers) {
-    fetchData('https://api-gymya-api.onrender.com/api/estadisticas/financieras', headers, (data) => {
-        document.getElementById("monthlyIncome").innerText = data.monthlyIncome;
-        document.getElementById("pendingPayments").innerText = data.pendingPayments;
-        document.getElementById("activeMemberships").innerHTML = data.activeMemberships.map(m => `<li>${m.type}: ${m.count}</li>`).join('');
-        renderChart("incomeChart", data.incomeChartData);
-    });
-}
+    async function fetchFinancialSummary(headers) {
+        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/financieras', headers, (data) => {
+            document.getElementById("monthlyIncome").innerText = data.monthlyIncome || 0;
+            document.getElementById("pendingPayments").innerText = data.pendingPayments || 0;
+            document.getElementById("activeMemberships").innerHTML = data.activeMemberships
+                .map(m => `<li>${m.type}: ${m.count}</li>`).join('') || "<li>No data</li>";
+            renderChart("incomeChart", data.incomeChartData);
+        });
+    }
 
     async function fetchClientStatistics(headers) {
-    fetchData('https://api-gymya-api.onrender.com/api/estadisticas/clientes', headers, (data) => {
-        document.getElementById("activeClients").innerText = data.activeClients;
-        document.getElementById("newClientsThisMonth").innerText = data.newClientsThisMonth;
-        document.getElementById("clientsByMembershipType").innerHTML = data.clientsByMembershipType.map(c => `<li>${c.type}: ${c.count}</li>`).join('');
-    });
-}
+        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/clientes', headers, (data) => {
+            document.getElementById("activeClients").innerText = data.activeClients || 0;
+            document.getElementById("newClientsThisMonth").innerText = data.newClientsThisMonth || 0;
+            document.getElementById("clientsByMembershipType").innerHTML = data.clientsByMembershipType
+                .map(c => `<li>${c.type}: ${c.count}</li>`).join('') || "<li>No data</li>";
+        });
+    }
 
-async function fetchActivityData(headers) {
-    fetchData('https://api-gymya-api.onrender.com/api/estadisticas/asistencias', headers, (data) => {
-        document.getElementById("dailyAttendances").innerText = data.dailyAttendances;
-        document.getElementById("recentAccessHistory").innerHTML = data.recentAccessHistory.map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('');
-        document.getElementById("topAttendees").innerHTML = data.topAttendees.map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('');
-        renderChart("peakHoursChart", data.peakHoursData);
-    });
-}
+    async function fetchActivityData(headers) {
+        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/asistencias', headers, (data) => {
+            document.getElementById("dailyAttendances").innerText = data.dailyAttendances || 0;
+            document.getElementById("recentAccessHistory").innerHTML = data.recentAccessHistory
+                .map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('') || "<li>No data</li>";
+            document.getElementById("topAttendees").innerHTML = data.topAttendees
+                .map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('') || "<li>No data</li>";
+            renderChart("peakHoursChart", data.peakHoursData);
+        });
+    }
 
-async function fetchAlerts(headers) {
-    fetchData('https://api-gymya-api.onrender.com/estadisticas/alertas', headers, (data) => {
-        document.getElementById("paymentAlerts").innerHTML = data.paymentAlerts.map(p => `<li>${p}</li>`).join('');
-        document.getElementById("membershipExpiryAlerts").innerHTML = data.membershipExpiryAlerts.map(m => `<li>${m}</li>`).join('');
-    });
-}
+    async function fetchAlerts(headers) {
+        fetchData('https://api-gymya-api.onrender.com/api/estadisticas/alertas', headers, (data) => {
+            document.getElementById("paymentAlerts").innerHTML = data.paymentAlerts
+                .map(p => `<li>${p}</li>`).join('') || "<li>No data</li>";
+            document.getElementById("membershipExpiryAlerts").innerHTML = data.membershipExpiryAlerts
+                .map(m => `<li>${m}</li>`).join('') || "<li>No data</li>";
+        });
+    }
 
     function renderChart(containerId, data) {
-        // Asume que estás usando una biblioteca como Chart.js para las gráficas
+        if (!data) return; // Verifica si hay datos para mostrar
         const ctx = document.getElementById(containerId).getContext('2d');
         new Chart(ctx, { type: 'line', data: data });
     }
@@ -148,6 +154,7 @@ async function fetchAlerts(headers) {
     function generateReport() { /* lógica de generación de reportes */ }
     function exportData() { /* lógica de exportación de datos */ }
 </script>
+
 
 </body>
 </html>
