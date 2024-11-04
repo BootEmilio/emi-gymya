@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Administración</title>
-    <link rel="stylesheet" href="/styles.css"> <!-- Añade tu archivo de CSS aquí -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -104,40 +103,46 @@
 
     async function fetchFinancialSummary(headers) {
         fetchData('https://api-gymya-api.onrender.com/api/estadisticas/financieras', headers, (data) => {
-            document.getElementById("monthlyIncome").innerText = data.monthlyIncome || 0;
-            document.getElementById("pendingPayments").innerText = data.pendingPayments || 0;
-            document.getElementById("activeMemberships").innerHTML = data.activeMemberships
-                .map(m => `<li>${m.type}: ${m.count}</li>`).join('') || "<li>No data</li>";
-            renderChart("incomeChart", data.incomeChartData);
+            document.getElementById("monthlyIncome").innerText = data?.monthlyIncome || 0;
+            document.getElementById("pendingPayments").innerText = data?.pendingPayments || 0;
+            document.getElementById("activeMemberships").innerHTML = Array.isArray(data?.activeMemberships) 
+                ? data.activeMemberships.map(m => `<li>${m.type}: ${m.count}</li>`).join('') 
+                : "<li>No data</li>";
+            renderChart("incomeChart", data?.incomeChartData);
         });
     }
 
     async function fetchClientStatistics(headers) {
         fetchData('https://api-gymya-api.onrender.com/api/estadisticas/clientes', headers, (data) => {
-            document.getElementById("activeClients").innerText = data.activeClients || 0;
-            document.getElementById("newClientsThisMonth").innerText = data.newClientsThisMonth || 0;
-            document.getElementById("clientsByMembershipType").innerHTML = data.clientsByMembershipType
-                .map(c => `<li>${c.type}: ${c.count}</li>`).join('') || "<li>No data</li>";
+            document.getElementById("activeClients").innerText = data?.activeClients || 0;
+            document.getElementById("newClientsThisMonth").innerText = data?.newClientsThisMonth || 0;
+            document.getElementById("clientsByMembershipType").innerHTML = Array.isArray(data?.clientsByMembershipType) 
+                ? data.clientsByMembershipType.map(c => `<li>${c.type}: ${c.count}</li>`).join('') 
+                : "<li>No data</li>";
         });
     }
 
     async function fetchActivityData(headers) {
         fetchData('https://api-gymya-api.onrender.com/api/estadisticas/asistencias', headers, (data) => {
-            document.getElementById("dailyAttendances").innerText = data.dailyAttendances || 0;
-            document.getElementById("recentAccessHistory").innerHTML = data.recentAccessHistory
-                .map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('') || "<li>No data</li>";
-            document.getElementById("topAttendees").innerHTML = data.topAttendees
-                .map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('') || "<li>No data</li>";
-            renderChart("peakHoursChart", data.peakHoursData);
+            document.getElementById("dailyAttendances").innerText = data?.dailyAttendances || 0;
+            document.getElementById("recentAccessHistory").innerHTML = Array.isArray(data?.recentAccessHistory) 
+                ? data.recentAccessHistory.map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('') 
+                : "<li>No data</li>";
+            document.getElementById("topAttendees").innerHTML = Array.isArray(data?.topAttendees) 
+                ? data.topAttendees.map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('') 
+                : "<li>No data</li>";
+            renderChart("peakHoursChart", data?.peakHoursData);
         });
     }
 
     async function fetchAlerts(headers) {
         fetchData('https://api-gymya-api.onrender.com/api/estadisticas/alertas', headers, (data) => {
-            document.getElementById("paymentAlerts").innerHTML = data.paymentAlerts
-                .map(p => `<li>${p}</li>`).join('') || "<li>No data</li>";
-            document.getElementById("membershipExpiryAlerts").innerHTML = data.membershipExpiryAlerts
-                .map(m => `<li>${m}</li>`).join('') || "<li>No data</li>";
+            document.getElementById("paymentAlerts").innerHTML = Array.isArray(data?.paymentAlerts) 
+                ? data.paymentAlerts.map(p => `<li>${p}</li>`).join('') 
+                : "<li>No data</li>";
+            document.getElementById("membershipExpiryAlerts").innerHTML = Array.isArray(data?.membershipExpiryAlerts) 
+                ? data.membershipExpiryAlerts.map(m => `<li>${m}</li>`).join('') 
+                : "<li>No data</li>";
         });
     }
 
@@ -154,7 +159,5 @@
     function generateReport() { /* lógica de generación de reportes */ }
     function exportData() { /* lógica de exportación de datos */ }
 </script>
-
-
 </body>
 </html>
