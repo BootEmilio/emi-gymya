@@ -1,0 +1,131 @@
+/* styles.css */
+
+/* Reset de márgenes y paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Contenedor principal del dashboard */
+.dashboard-container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Título de sección */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #444;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 8px;
+}
+
+/* Tarjetas de resumen */
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 220px;
+    padding: 20px;
+    margin: 10px;
+    background-color: #f5f7fa;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 1.2rem;
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+.stat-card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Contenedor de tarjetas (para organizar en filas) */
+.stat-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* Lista de alertas y notificaciones */
+.alert-list, .data-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.alert-list li, .data-list li {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #fffbec;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 5px;
+}
+
+/* Gráficos */
+.chart-container {
+    margin-top: 20px;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones de acción */
+.action-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #218838;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .stat-cards-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-card {
+        max-width: 100%;
+    }
+}
