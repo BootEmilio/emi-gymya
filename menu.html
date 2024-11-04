@@ -52,7 +52,7 @@
     <!-- Acceso rápido a Funcionalidades -->
     <section id="quickAccess">
         <h3>Acceso rápido</h3>
-        <button onclick="registerNewClient()">Registro de nuevos clientes</button>
+        <button onclick="registerNewClient()">Registro de nuevos usuarios</button>
         <button onclick="registerPayment()">Registro de pago</button>
         <button onclick="manageMemberships()">Administración de membresías</button>
         <button onclick="viewClientHistory()">Historial de clientes</button>
@@ -103,7 +103,7 @@
 }
 
 async function fetchFinancialSummary(headers) {
-    fetchData('https://api-gymya-api.onrender.com/api/financial-summary', headers, (data) => {
+    fetchData('https://api-gymya-api.onrender.com/api/estadisticas/financieras', headers, (data) => {
         document.getElementById("monthlyIncome").innerText = data.monthlyIncome;
         document.getElementById("pendingPayments").innerText = data.pendingPayments;
         document.getElementById("activeMemberships").innerHTML = data.activeMemberships.map(m => `<li>${m.type}: ${m.count}</li>`).join('');
@@ -112,7 +112,7 @@ async function fetchFinancialSummary(headers) {
 }
 
     async function fetchClientStatistics(headers) {
-    fetchData('https://api-gymya-api.onrender.com/api/client-statistics', headers, (data) => {
+    fetchData('https://api-gymya-api.onrender.com/api/estadisticas/clientes', headers, (data) => {
         document.getElementById("activeClients").innerText = data.activeClients;
         document.getElementById("newClientsThisMonth").innerText = data.newClientsThisMonth;
         document.getElementById("clientsByMembershipType").innerHTML = data.clientsByMembershipType.map(c => `<li>${c.type}: ${c.count}</li>`).join('');
@@ -120,7 +120,7 @@ async function fetchFinancialSummary(headers) {
 }
 
 async function fetchActivityData(headers) {
-    fetchData('https://api-gymya-api.onrender.com/api/activity-data', headers, (data) => {
+    fetchData('https://api-gymya-api.onrender.com/api/estadisticas/asistencias', headers, (data) => {
         document.getElementById("dailyAttendances").innerText = data.dailyAttendances;
         document.getElementById("recentAccessHistory").innerHTML = data.recentAccessHistory.map(a => `<li>${a.clientName}: ${a.accessTime}</li>`).join('');
         document.getElementById("topAttendees").innerHTML = data.topAttendees.map(t => `<li>${t.name} - ${t.attendanceCount}</li>`).join('');
@@ -129,7 +129,7 @@ async function fetchActivityData(headers) {
 }
 
 async function fetchAlerts(headers) {
-    fetchData('https://api-gymya-api.onrender.com/api/alerts', headers, (data) => {
+    fetchData('https://api-gymya-api.onrender.com/estadisticas/alertas', headers, (data) => {
         document.getElementById("paymentAlerts").innerHTML = data.paymentAlerts.map(p => `<li>${p}</li>`).join('');
         document.getElementById("membershipExpiryAlerts").innerHTML = data.membershipExpiryAlerts.map(m => `<li>${m}</li>`).join('');
     });
